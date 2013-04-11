@@ -1,0 +1,9 @@
+{
+	"title": "Slim Case for Arduino UNO R2",
+	"URL": "https://github.com/t-paul/things/tree/master/things/arduino-case",
+	"author": "Torsten Paul",
+	"license": "CC-BY-SA 2.0",
+	"tags": ["arduino", "openscad", "case" ],
+	"thumbnailURL": "https://raw.github.com/t-paul/things/master/things/arduino-case/img/arduino-case.jpg",
+	"description": "Slim Case for Arduino UNO R2"
+}
