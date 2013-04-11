@@ -1,3 +1,10 @@
+/*********************************************************************************************
+ *  Mobile Phone Stand
+ *  iPhone 5 / Cable: Original Apple or Amazon Basics
+ *  (c) 2013 Torsten Paul <Torsten.Paul@gmx.de>
+ *  License: CC-BY-SA 3.0
+ */
+
 $fn = 80;
 rotate_fn = 120;
 
@@ -92,7 +99,7 @@ module plate() {
 
 module top() {
 	translate([0, 0, bend_d / 2 + outer_d / 2]) rotate([0, 90 + plate_rotation, 0]) translate([0, 0, -bend_d / 2]) rotate([90, 0, -90]) {
-		!difference() {
+		difference() {
 			union() {
 				difference() {
 					union() {
