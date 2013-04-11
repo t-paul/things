@@ -1,0 +1,9 @@
+{
+	"title": "Webcam holder for Ultimaker",
+	"URL": "https://github.com/t-paul/things/tree/master/things/webcam-holder",
+	"author": "Torsten Paul",
+	"license": "CC-BY-SA 3.0",
+	"tags": [ "ultimaker", "openscad", "webcam" ],
+	"thumbnailURL": "https://raw.github.com/t-paul/things/master/things/webcam-holder/img/webcam-holder.jpg",
+	"description": "Webcam holder for Ultimaker"
+}
