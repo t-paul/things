@@ -19,8 +19,8 @@ cable_d = 4;
 
 bend_d = 30;
 
-add_clamp = 0;
-plate_w = 40; // with cable 50, with clamp minimum 65
+add_clamp = 1;
+plate_w = 65; // with cable 50, with clamp minimum 65
 
 plate_h = 18; // small 20, big 25
 plate_d = 3; // thickness of the plate, with clamp should be > 3, otherwise 2 is ok
