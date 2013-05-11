@@ -2,16 +2,18 @@
  *  Case for Hive Retro Style Computer
  *  (c) 2013 Torsten Paul <Torsten.Paul@gmx.de>
  *  License: CC-BY-SA 3.0
+ *
+ *  Settings according to the board layout of Hive R14-V (hive-1-ver3-r14-v.brd).
  */
 
 // WriteScad By Harlan Martin, harlan@sutlog.com, January 2012
 use <write.scad>
 
+$fn = 80;
+
 /******************************************************************************
  *  Definitions
  */
-$fn = 80;
-
 wall = 2;
 nut_diameter = 6.4;
 nut_height = 2.8;
@@ -19,6 +21,13 @@ spacer_extra_height = 4;
 spacer_cone_height = 3;
 
 screw_diameter = 3.6;
+
+serial_number = "363";
+font_name = "orbitron.dxf";
+
+/******************************************************************************
+ *  Calculations
+ */
 
 mil_to_mm = 0.0254;
 
@@ -48,11 +57,10 @@ host_ps2_x = 5125 * mil_to_mm;
 power_x = 5700 * mil_to_mm;
 reset_x = 6075 * mil_to_mm;
 
-sd_y = 900 * mil_to_mm;
+sd_y = 875 * mil_to_mm;
 usb_host_y = 1675 * mil_to_mm;
 
 spacer_total_height = nut_height + spacer_extra_height + spacer_cone_height;
-echo("spacer: ", spacer_total_height);
 
 nozzle_size = 0.4;
 /******************************************************************************
@@ -75,8 +83,8 @@ module test1() {
 module test2() {
 	difference() {
 		bottom();
-		translate([0, -22, 0]) cube([400, 200, 200], center = true);
-		translate([80, -6, 0]) cube([130, 200, 200], center = true);
+		translate([-50, 40, 0]) cube([400, 200, 200], center = true);
+		translate([120, 60, 122]) cube([130, 200, 200], center = true);
 	}
 }
 
@@ -105,10 +113,10 @@ module spacer(x, y, r) {
 	}
 }
 
-module base(ew, ed) {
+module base(ew, ed, ef) {
 	union() {
 		difference() {
-			translate([-ew / 2, -ed / 2, 0]) cube([width + ew, depth + ed, wall]);
+			translate([-ew / 2, -ed / 2 - ef, 0]) cube([width + ew, depth + ed + ef, wall]);
 			for (a = [10 : 10 : width / 2 - 15]) {
 				translate([a + 1, 10, -1]) cube([6, depth - 20, wall + 2]);
 			}
@@ -231,7 +239,8 @@ module vga_connector(x, z_base) {
 }
 
 module network_connector(x, z_base) {
-	translate([x, 0, z_base + 10]) rotate([90, 0, 0]) cube([10, 10, 10], center = true);
+	h = 12.5;
+	translate([x, 0, z_base + 1.6 + h / 2]) rotate([90, 0, 0]) cube([14, h, 10], center = true);
 }
 
 module power_connector(x, z_base) {
@@ -243,29 +252,33 @@ module reset_connector(x, z_base) {
 }
 
 module sd_connector(x, z_base) {
-	translate([x, 0, z_base + 2.9]) rotate([90, 0, 0]) cube([25, 3, 10], center = true);
+	h = 3.2;
+	translate([x, 0, z_base + 1.6 + h / 2]) rotate([90, 0, 0]) cube([25.5, h, 10], center = true);
 }
 
 module usb_host_connector(x, z_base) {
-	translate([x, 0, z_base + 2.9]) rotate([90, 0, 0]) cube([12, 4, 10], center = true);
+	h = 4;
+	translate([x, 0, z_base + 1.6 + h / 2]) rotate([90, 0, 0]) cube([11.5, h, 10], center = true);
 }
 
 module bottom() {
-	ew = 10;
-	ed = 2 * wall + 1;
+	ew = 10;  // extra width, distributed on both sides
+	ed = 2 * wall + 2; // extra depth to both front and back
+	ef = 6; // extra font depth
 	h = 35;
+	logo_height = 0.35;
 	difference() {
 		union() {
-			base(ew = ew, ed = ed);
+			base(ew = ew, ed = ed, ef = ef);
 			// left
-			translate([-ew / 2, -ed / 2, 0]) cube([wall, depth + ed, h]);
+			translate([-ew / 2, -ed / 2 - ef, 0]) cube([wall, depth + ed + ef, h]);
 			// right
-			translate([width + ew / 2 - wall, -ed / 2, 0]) cube([wall, depth + ed, h]);
+			translate([width + ew / 2 - wall, -ed / 2 - ef, 0]) cube([wall, depth + ed + ef, h]);
 			// front
-			translate([-ew / 2, -ed / 2, 0]) cube([width + ew, wall, h]);
-			translate([0, -ed / 2 + wall, 4]) rotate([90, 0, 0]) hive_logo(wall = wall, h = 0.3);
-			color("black") translate([width - 17, -ed / 2 + 0.3, 4]) rotate([90, 0, 0]) {
-				write("363", t = 0.6, h = 8, space = 1.2, font = "orbitron.dxf");
+			translate([-ew / 2, -ed / 2 - ef, 0]) cube([width + ew, wall, h]);
+			translate([0, -ed / 2 + wall - ef, 4]) rotate([90, 0, 0]) hive_logo(wall = wall, h = logo_height);
+			color("black") translate([width - 17, -ed / 2 -ef + logo_height, 4]) rotate([90, 0, 0]) {
+				write(serial_number, t = 2 * logo_height, h = 8, space = 1.2, font = font_name);
 			}
 			// back
 			translate([-ew / 2, depth + ed / 2 - wall]) cube([width + ew, wall, h]);
@@ -276,12 +289,12 @@ module bottom() {
 			ps2_connector(x = keyboard_ps2_x, z_base = spacer_total_height);
 			ps2_connector(x = mouse_ps2_x, z_base = spacer_total_height);
 			vga_connector(x = vga_x, z_base = spacer_total_height);
-			//network_connector(x = network_x, z_base = spacer_total_height);
+			network_connector(x = network_x, z_base = spacer_total_height);
 			ps2_connector(x = host_ps2_x, z_base = spacer_total_height);
 			power_connector(x = power_x, z_base = spacer_total_height);
 			reset_connector(x = reset_x, z_base = spacer_total_height);
 		}
-		translate([width + ew / 2, 0, 0]) rotate([0, 0, 90]) {
+		translate([width + ew / 2, 0, wall]) rotate([0, 0, 90]) {
 			sd_connector(x = sd_y, z_base = spacer_total_height);
 			usb_host_connector(x = usb_host_y, z_base = spacer_total_height);
 		}
