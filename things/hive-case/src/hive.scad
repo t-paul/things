@@ -1,8 +1,24 @@
-$fn = 80;
+/******************************************************************************
+ *  Case for Hive Retro Style Computer
+ *  (c) 2013 Torsten Paul <Torsten.Paul@gmx.de>
+ *  License: CC-BY-SA 3.0
+ */
 
+// WriteScad By Harlan Martin, harlan@sutlog.com, January 2012
+use <write.scad>
+
+/******************************************************************************
+ *  Definitions
+ */
+$fn = 80;
 
 wall = 2;
 nut_diameter = 6.4;
+nut_height = 2.8;
+spacer_extra_height = 4;
+spacer_cone_height = 3;
+
+screw_diameter = 3.6;
 
 mil_to_mm = 0.0254;
 
@@ -22,31 +38,92 @@ h5_y = 2900 * mil_to_mm;
 h6_x = 2900 * mil_to_mm;
 h6_y = 400 * mil_to_mm;
 
-module hole(x, y) {
-	h = 6 + wall;
-	translate([x, y, 0]) {
+audio_x = 700 * mil_to_mm;
+video_x = 1250 * mil_to_mm;
+keyboard_ps2_x = 1825 * mil_to_mm;
+mouse_ps2_x = 2500 * mil_to_mm;
+vga_x = 3425 * mil_to_mm;
+network_x = 4425 * mil_to_mm;
+host_ps2_x = 5125 * mil_to_mm;
+power_x = 5700 * mil_to_mm;
+reset_x = 6075 * mil_to_mm;
+
+sd_y = 900 * mil_to_mm;
+usb_host_y = 1675 * mil_to_mm;
+
+spacer_total_height = nut_height + spacer_extra_height + spacer_cone_height;
+echo("spacer: ", spacer_total_height);
+
+nozzle_size = 0.4;
+/******************************************************************************
+ *  Top-Level modules, remove the '*' from the module that should be generated
+ */
+
+*test1();
+*test2();
+*plate();
+bottom();
+
+/******************************************************************************
+ *  Other modules
+ */
+module test1() {
+	translate([0, 0, 2]) cube([12, 12, 4], center = true);
+	translate([0, 0, 4]) hole(x = 0, y = 0, r = 0);
+}
+
+module test2() {
+	difference() {
+		bottom();
+		translate([0, -22, 0]) cube([400, 200, 200], center = true);
+		translate([80, -6, 0]) cube([130, 200, 200], center = true);
+	}
+}
+
+module spacer(x, y, r) {
+	d = 10;
+	h = nut_height + spacer_extra_height;
+	ir = (nut_diameter / 2) / (2 * tan(180 / 6));
+	nut_offset = 1;
+
+	xx = sqrt(pow(d / 2, 2) - pow(ir, 2));
+	translate([x, y, 0]) rotate([0, 0, r]) {
 		difference() {
-			cylinder(r = 5, h = h);
-			translate([0, 0, wall]) cylinder(r = 2, h = h + 1);
-			translate([0, 0, h - 3]) cylinder(r = nut_diameter / 2, h = wall + 6 + 2, $fn = 6);
+			union() {
+				cylinder(r = d / 2, h = h);
+				translate([0, 0, h]) cylinder(r1 = d / 2, r2 = screw_diameter / 2 + nozzle_size, h = spacer_cone_height);
+			}
+			translate([0, 0, -1]) cylinder(r = screw_diameter / 2, h = h + 100);
+			translate([0, 0, nut_offset + nut_height]) cylinder(r1 = ir - nozzle_size, r = screw_diameter / 2, h = 0.3);
+			translate([0, 0, nut_offset]) cylinder(r = nut_diameter / 2, h = nut_height, $fn = 6);
+			translate([50, 0, nut_height / 2 + nut_offset]) cube([100, 2 * ir, nut_height], center = true);
+			difference() {
+				translate([xx, 0, 0]) rotate([0, -45, 0]) translate([50, 0, nut_height / 2 + nut_offset]) cube([100, 2 * ir, nut_height], center = true);
+				translate([0, 0, nut_offset]) cube([100, 2 * ir, nut_height], center = true);
+			}
 		}
 	}
 }
 
-module base() {
+module base(ew, ed) {
 	union() {
 		difference() {
-			cube([width, depth, wall]);
-			for (a = [10 : 8 : width - 10]) {
-				translate([a, 10, -1]) cube([4, depth - 20, wall + 2]);
+			translate([-ew / 2, -ed / 2, 0]) cube([width + ew, depth + ed, wall]);
+			for (a = [10 : 10 : width / 2 - 15]) {
+				translate([a + 1, 10, -1]) cube([6, depth - 20, wall + 2]);
+			}
+			for (a = [10 : 10 : width / 2 - 5]) {
+				translate([width - a - 7, 10, -1]) cube([6, depth - 20, wall + 2]);
 			}
 		}
-		hole(x = h1_x, y = h1_y);
-		hole(x = h2_x, y = h2_y);
-		hole(x = h3_x, y = h3_y);
-		hole(x = h4_x, y = h4_y);
-		hole(x = h5_x, y = h5_y);
-		hole(x = h6_x, y = h6_y);
+		translate([0, 0, wall]) {
+			spacer(x = h1_x, y = h1_y, r = 0);
+			spacer(x = h2_x, y = h2_y, r = 180);
+			spacer(x = h3_x, y = h3_y, r = 0);
+			spacer(x = h4_x, y = h4_y, r = 180);
+			spacer(x = h5_x, y = h5_y, r = 90);
+			spacer(x = h6_x, y = h6_y, r = 90);
+		}
 	}
 }
 
@@ -111,26 +188,102 @@ module hive(h) {
 	translate([11.75 * w, 1.75 * w, 0]) cylinder(r = w / 2, h = h);
 }
 
-module hive_logo(h) {
-	scale([1, 0.8, 1]) {
-		cube([200, 48, wall]);
-		translate([27, 20, 0]) logo(h = h);
-		translate([65, 4, 0]) hive(h = h);
-	}
-}
-
-module spacer() {
-	difference() {
-		cylinder(r1 = 5, r2 = 2 + 0.4, h = 4);
-		translate([0, 0, -1]) cylinder(r = 2, h = 6);
+logo_width = 100;
+logo_height = 22;
+module hive_logo(wall, h) {
+	cube([logo_width, logo_height, wall]);
+	color("black") {
+		translate([logo_width / 200 * 27, logo_height / 48 * 22, 0]) scale([logo_width / 200, 0.8 * logo_width / 200, 1]) logo(h = wall + h);
+		translate([logo_width / 200 * 65, logo_height / 48 * 8, 0]) scale([logo_height / 48, 0.8 * logo_height / 48, 1]) hive(h = wall + h);
 	}
 }
 
 module plate() {
-	base();
-	translate([30, 20, 0]) scale([0.5, 0.5, 1]) hive_logo(h = 5);
+	base(ew = 0, ed = 0);
+	translate([30, 20, 0]) hive_logo(wall = wall, h = 2);
 }
 
-spacer();
-!plate();
+module phone_connector(x, z_base) {
+	translate([x, 0, z_base + 4.7]) rotate([90, 0, 0]) cylinder(r = 5, h = 10, center = true);
+}
 
+module video_connector(x, z_base) {
+	translate([x, 0, z_base + 8.2]) rotate([90, 0, 0]) cylinder(r = 5.5, h = 10, center = true);
+}
+
+module ps2_connector(x, z_base) {
+	translate([x, 0, z_base + 8.2]) rotate([90, 0, 0]) cylinder(r = 6.6, h = 10, center = true);
+}
+
+module vga_connector(x, z_base) {
+	translate([x, 0, z_base + 8.2]) rotate([90, 0, 0]) {
+		hull() {
+			translate([13, 0, 0]) cylinder(r = 3.2, h = 10, center = true);
+			translate([-13, 0, 0]) cylinder(r = 3.2, h = 10, center = true);
+		}
+		hull() {
+			translate([9, 4.5, 0]) cylinder(r = 1, h = 10, center = true);
+			translate([-9, 4.5, 0]) cylinder(r = 1, h = 10, center = true);
+			translate([7.5, -4.5, 0]) cylinder(r = 1, h = 10, center = true);
+			translate([-7.5, -4.5, 0]) cylinder(r = 1, h = 10, center = true);
+		}
+	}
+}
+
+module network_connector(x, z_base) {
+	translate([x, 0, z_base + 10]) rotate([90, 0, 0]) cube([10, 10, 10], center = true);
+}
+
+module power_connector(x, z_base) {
+	translate([x, 0, z_base + 8.2]) rotate([90, 0, 0]) cylinder(r = 5.5, h = 10, center = true);
+}
+
+module reset_connector(x, z_base) {
+	translate([x, 0, z_base + 5.7]) rotate([90, 0, 0]) cylinder(r = 2.5, h = 10, center = true);
+}
+
+module sd_connector(x, z_base) {
+	translate([x, 0, z_base + 2.9]) rotate([90, 0, 0]) cube([25, 3, 10], center = true);
+}
+
+module usb_host_connector(x, z_base) {
+	translate([x, 0, z_base + 2.9]) rotate([90, 0, 0]) cube([12, 4, 10], center = true);
+}
+
+module bottom() {
+	ew = 10;
+	ed = 2 * wall + 1;
+	h = 35;
+	difference() {
+		union() {
+			base(ew = ew, ed = ed);
+			// left
+			translate([-ew / 2, -ed / 2, 0]) cube([wall, depth + ed, h]);
+			// right
+			translate([width + ew / 2 - wall, -ed / 2, 0]) cube([wall, depth + ed, h]);
+			// front
+			translate([-ew / 2, -ed / 2, 0]) cube([width + ew, wall, h]);
+			translate([0, -ed / 2 + wall, 4]) rotate([90, 0, 0]) hive_logo(wall = wall, h = 0.3);
+			color("black") translate([width - 17, -ed / 2 + 0.3, 4]) rotate([90, 0, 0]) {
+				write("363", t = 0.6, h = 8, space = 1.2, font = "orbitron.dxf");
+			}
+			// back
+			translate([-ew / 2, depth + ed / 2 - wall]) cube([width + ew, wall, h]);
+		}
+		translate([0, depth + ed / 2, wall]) {
+			phone_connector(x = audio_x, z_base = spacer_total_height);
+			video_connector(x = video_x, z_base = spacer_total_height);
+			ps2_connector(x = keyboard_ps2_x, z_base = spacer_total_height);
+			ps2_connector(x = mouse_ps2_x, z_base = spacer_total_height);
+			vga_connector(x = vga_x, z_base = spacer_total_height);
+			//network_connector(x = network_x, z_base = spacer_total_height);
+			ps2_connector(x = host_ps2_x, z_base = spacer_total_height);
+			power_connector(x = power_x, z_base = spacer_total_height);
+			reset_connector(x = reset_x, z_base = spacer_total_height);
+		}
+		translate([width + ew / 2, 0, 0]) rotate([0, 0, 90]) {
+			sd_connector(x = sd_y, z_base = spacer_total_height);
+			usb_host_connector(x = usb_host_y, z_base = spacer_total_height);
+		}
+	}
+}
