@@ -10,7 +10,7 @@ height = 9;
 outer_radius = 160;
 outer_thickness = 2.8;
 inner_thickness = 3;
-gap = 0.3;
+gap = 0.2;
 length = 80;
 scale = 2;
 clamp_angle = 20;
@@ -50,7 +50,7 @@ module cut() {
 }
 
 module outer_arm() {
-	render() difference() {
+	difference() {
 		base(outer_radius, outer_thickness);
 		cut();
 		cylinder($fn = base_fn, r2 = 0, r1 = outer_radius - outer_thickness + gap, h = outer_radius);
@@ -101,7 +101,7 @@ module outer_clip() {
 				rotate([0, 0, -45]) translate([-2 * outer_thickness, -4 * outer_thickness + inner_thickness / 2, height / 2 - 4 * height / 16]) cube([4 * outer_thickness, 4 * outer_thickness, 4 * height / 8]);
 			}
 		}
-		inner_cylinder(r_extra = 2 * gap / 3, h_extra = 1);
+		inner_cylinder(r_extra = gap / 2, h_extra = 0.1);
 		translate([0, 0, -gap]) cylinder(r1 = inner_thickness / 2 + 3 * gap, r2 = 0, h = inner_thickness / 2 + 3 * gap);
 		translate([0, 0, height - inner_thickness / 2 - 2 * gap]) cylinder(r2 = inner_thickness / 2 + 3 * gap, r1 = 0, h = inner_thickness / 2 + 3 * gap);
 	}
