@@ -50,7 +50,8 @@ module base() {
 		translate([length, wall + width / 2, wall + led_z]) rotate([0, 90, 0]) cylinder(r = led_diameter / 2, h = 20, center = true);
 	}
 	translate([usb_x + pcb_length, wall - gap, 0]) cube([5, width + 2 * gap, usb_z + wall + 4]);
-	translate([usb_x + pcb_length + battery_length + 5, wall - gap, 0]) cube([5, width + 2 * gap, usb_z + wall + 4]);
+	translate([usb_x + pcb_length + battery_length + 5, width + wall - 8 - gap, 0]) cube([5, 8 + gap, usb_z + wall + 4]);
+	translate([usb_x + pcb_length + battery_length + 5, wall - gap, 0]) cube([5, 8 + gap, usb_z + wall + 4]);
 
 	translate([usb_x - 0.5, width / 2 - 2.5 + wall, 0]) cube([3, 5, usb_z + wall]);
 	translate([usb_x + pcb_length - 3, wall + width - gap - 6, 0]) cube([5, 2, usb_z + wall]);
@@ -59,8 +60,8 @@ module base() {
 }
 
 
-//!lock();
+//lock();
 difference() {
 	base();
-	//translate([usb_width + usb_x + wall + 5 + 100, 0, 0]) cube([200, 200, 200], center = true);
+	//translate([-10, 0, 0]) cube([200, 200, 200], center = true);
 }
