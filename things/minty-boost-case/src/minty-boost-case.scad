@@ -1,3 +1,13 @@
+/*********************************************************************************************
+ *  Minty Boost Case
+ *  (c) 2013 Torsten Paul <Torsten.Paul@gmx.de>
+ *  License: CC-BY-SA 3.0
+ */
+
+/*********************************************************************************************
+ *  Definitions
+ */
+
 $fn = 50;
 
 use <util.scad>
@@ -44,6 +54,19 @@ ic_post_offset = 10;
 
 w2 = 2 * wall;
 
+/*********************************************************************************************
+ *  Top-Level modules, remove the '*' from the module that should be generated
+ */
+
+*lid();
+*base();
+plate();
+*assembly();
+
+/*********************************************************************************************
+ *  Other modules
+ */
+
 module base() {
 	difference() {
 		roundedCube([length + w2, width + w2, height + wall], 5, true);
@@ -84,7 +107,10 @@ module base() {
 }
 
 module lid() {
+    rotate([180, 0, 0]) lid_rotated();  
+}
 
+module lid_rotated() {
     roundedCube([length + w2, width + w2, lid_height], 5, true);
 
     translate([wall + length - lid_height, width / 2 + wall, 0])  rotate([-90, 0, 0]) cylinder(r = lid_height, h = 0.6 * width, center = true);
@@ -109,8 +135,12 @@ module lid() {
     }
 }
 
-translate([0, 0, 2 * height]) lid();
-difference() {
-	base();
-	//translate([usb_width + usb_x + wall + 5 + 100, 0, 0]) cube([200, 200, 200], center = true);
+module assembly() {
+    translate([0, 0, 2 * height]) lid_rotated();
+    base();
+}
+
+module plate() {
+    translate([0, -10, lid_height]) lid();
+    translate([0, 10, 0]) base();
 }
